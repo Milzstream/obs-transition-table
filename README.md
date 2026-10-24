@@ -2,6 +2,8 @@
 
 Plugin for OBS Studio to add a Transition Table to the tools menu.
 
+Requires OBS Studio 33 or newer. The Windows installer uses `C:\ProgramData\obs-studio\plugins\transition-table`. Portable OBS: extract the Windows zip into the `plugins` folder beside `bin`.
+
 Inspired by https://github.com/admshao/obs-transition-matrix
 
 # Download

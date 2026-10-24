@@ -284,14 +284,27 @@ jobs:
           target: x64
           config: ${{ needs.check-event.outputs.config }}
 
+      - name: Check SignPath 🔑
+        id: signpath
+        env:
+          SIGNPATH_API_TOKEN: ${{ secrets.SIGNPATH_API_TOKEN }}
+        run: |
+          if ($env:SIGNPATH_API_TOKEN) {
+            "enabled=true" >> $env:GITHUB_OUTPUT
+          } else {
+            "enabled=false" >> $env:GITHUB_OUTPUT
+          }
+
       - name: Upload Unsigned Artifact 📡
         id: upload-unsigned-dll
+        if: steps.signpath.outputs.enabled == 'true'
         uses: actions/upload-artifact@v4
         with:
           name: ${{ steps.setup.outputs.pluginName }}-${{ steps.setup.outputs.pluginVersion }}-windows-x64-programdata-${{ needs.check-event.outputs.commitHash }}
           path: ${{ github.workspace }}/release/${{ needs.check-event.outputs.config }}/
 
       - name: submit signing request dll ✍
+        if: steps.signpath.outputs.enabled == 'true'
         uses: signpath/github-action-submit-signing-request@v3
         with:
           api-token: '${{ secrets.SIGNPATH_API_TOKEN }}'
@@ -312,12 +325,14 @@ jobs:
 
       - name: Upload installer 📡
         id: upload-unsigned-installer
+        if: steps.signpath.outputs.enabled == 'true'
         uses: actions/upload-artifact@v4
         with:
           name: ${{ steps.setup.outputs.pluginName }}-${{ steps.setup.outputs.pluginVersion }}-windows-x64-installer-${{ needs.check-event.outputs.commitHash }}
           path: ${{ github.workspace }}/release/${{ steps.setup.outputs.pluginName }}-${{ steps.setup.outputs.pluginVersion }}-windows-x64-Installer.exe
 
       - name: submit signing request installer ✍
+        if: steps.signpath.outputs.enabled == 'true'
         uses: signpath/github-action-submit-signing-request@v3
         with:
           api-token: '${{ secrets.SIGNPATH_API_TOKEN }}'
